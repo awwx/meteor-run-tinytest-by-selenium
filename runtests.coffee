@@ -37,8 +37,8 @@ else
   process.exit 1
 sauce_key = read_json_file saucelabs_key_file
 
-_set_test_status = (config, jobid, passed, cb) ->
-  body = new Buffer(JSON.stringify({passed: passed}))
+_set_saucelabs_test_data = (config, jobid, data, cb) ->
+  body = new Buffer(JSON.stringify(data))
 
   req = http.request(
     {
@@ -64,10 +64,10 @@ _set_test_status = (config, jobid, passed, cb) ->
   req.write(body)
   req.end()
 
-set_test_status = (session_id, passed) ->
+set_saucelabs_test_data = (session_id, data) ->
   result = _when.defer()
   try
-    _set_test_status sauce_key, session_id, passed, (err) ->
+    _set_saucelabs_test_data sauce_key, session_id, data, (err) ->
       if err
         result.reject(err)
       else
@@ -75,6 +75,9 @@ set_test_status = (session_id, passed) ->
   catch e
     result.reject(e)
   result.promise
+
+set_test_status = (session_id, passed) ->
+  set_saucelabs_test_data session_id, {passed}
 
 create_client = ->
   if test_config.where is 'local'
@@ -152,6 +155,11 @@ run_tests_on_browser = (run, browser_capabilities) ->
     try
       session_id = browser.init capabilities
       browser.get url
+
+      userAgent = browser.eval 'navigator.userAgent'
+      log 'userAgent:', userAgent
+      if test_config.where is 'saucelabs'
+        set_saucelabs_test_data session_id, {'custom-data': {userAgent}}
 
       ok = poll 10000, 1000, (-> browser.hasElementByCssSelector('.header')),
         (-> log 'waiting for test-in-browser\'s .header div to appear')
