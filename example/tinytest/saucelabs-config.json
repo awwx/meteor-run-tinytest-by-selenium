@@ -1,6 +1,7 @@
 {
   "name": "example tinytest",
   "where": "saucelabs",
+  "parallelTests": 3,
   "browsers": [
     {
       "browserName": "opera",
@@ -15,10 +16,15 @@
     {
       "browserName": "firefox",
       "version": "18",
-      "platform": "Windows 2008"
+      "platform": "Windows 2012"
     },
     {
       "browserName": "chrome",
+      "platform": "Windows 2008"
+    },
+    {
+      "browserName": "safari",
+      "version": "5",
       "platform": "Windows 2008"
     }
   ]
