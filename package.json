@@ -1,0 +1,7 @@
+{
+  "name": "sauce",
+  "version": "0.0.1",
+  "dependencies": [
+    "when"
+  ]
+}
