@@ -154,6 +154,7 @@ run_tests_on_browser = (run, browser_capabilities) ->
     session_id = null
     try
       session_id = browser.init capabilities
+      browser.setImplicitWaitTimeout 1000
       browser.get url
 
       userAgent = browser.eval 'navigator.userAgent'
@@ -172,6 +173,9 @@ run_tests_on_browser = (run, browser_capabilities) ->
       ok = poll 10000, 1000, (-> browser.hasElementByCssSelector('.header')),
         (-> log 'waiting for test-in-browser\'s .header div to appear')
       throw new Error('test-in-browser .header div not found') unless ok?
+
+      if test_config.windowtest
+        browser.elementById('begin-tests-button').click()
 
       log 'tests are running'
 
