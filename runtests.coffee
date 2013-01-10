@@ -158,8 +158,16 @@ run_tests_on_browser = (run, browser_capabilities) ->
 
       userAgent = browser.eval 'navigator.userAgent'
       log 'userAgent:', userAgent
+
+      meteor_runtime_config = browser.eval 'window.__meteor_runtime_config__'
+      git_commit = meteor_runtime_config?.git_commit
+      log 'git_commit:', git_commit if git_commit?
+
       if test_config.where is 'saucelabs'
-        set_saucelabs_test_data session_id, {'custom-data': {userAgent}}
+        data = {}
+        data['custom-data'] = {userAgent} if userAgent?
+        data['build']       = git_commit  if git_commit?
+        set_saucelabs_test_data session_id, data
 
       ok = poll 10000, 1000, (-> browser.hasElementByCssSelector('.header')),
         (-> log 'waiting for test-in-browser\'s .header div to appear')
