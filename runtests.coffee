@@ -155,6 +155,13 @@ run_tests_on_browser = (run, browser_capabilities) ->
     try
       session_id = browser.init capabilities
       browser.setImplicitWaitTimeout 1000
+
+      windowHandles = browser.windowHandles()
+      if windowHandles.length isnt 1
+        throw new Error('expected one window open at this point')
+      mainWindowHandle = windowHandles[0]
+      console.log 'mainWindowHandle', mainWindowHandle
+
       browser.get url
 
       ok = poll 10000, 1000, (-> browser.hasElementByCssSelector('.header')),
@@ -180,6 +187,10 @@ run_tests_on_browser = (run, browser_capabilities) ->
       log 'tests are running'
 
       result = poll 10000, 1000, (->
+        ## TODO I haven't been able to get switching focus to another window
+        ## to work; I always get "NoSuchWindow".
+        # browser.window mainWindowHandle
+
         if browser.hasElementByCssSelector('.header.pass')
           'pass'
         else if browser.hasElementByCssSelector('.header.fail')
@@ -198,16 +209,27 @@ run_tests_on_browser = (run, browser_capabilities) ->
       log e['jsonwire-error'] if e['jsonwire-error']?
       log 'err', e
       test_status = 'error'
-    finally
-      # Leave the browser open if running tests locally and the test failed.
-      # (No point in leaving it open at saucelabs since it will timeout anyway).
-      if test_config.where is 'saucelabs' or test_status
-        try
-          log run, 'shutting down the browser'
-          browser.quit()
-        catch e
-          log run, 'unable to quit browser', e
+
+    try
+      browser.window mainWindowHandle
+      clientlog = browser.eval '$("#log").text()'
+      log 'clientlog', clientlog
+    catch e
+      log 'unable to capture client log:'
+      log e['jsonwire-error'] if e['jsonwire-error']?
+      log e
+
+    # Leave the browser open if running tests locally and the test failed.
+    # (No point in leaving it open at saucelabs since it will timeout anyway).
+    if test_config.where is 'saucelabs' or test_status
+      try
+        log run, 'shutting down the browser'
+        browser.quit()
+      catch e
+        log run, 'unable to quit browser', e
+
     log run, 'tests finished:', test_status
+
     if test_config.where is 'saucelabs'
       log 'setting test status at saucelabs', test_status is 'pass'
       set_test_status(session_id, test_status is 'pass')
