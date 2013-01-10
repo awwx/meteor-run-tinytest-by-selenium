@@ -4,6 +4,7 @@
     "branch": "master"
   },
   "packages": {
+    "git-commit-sha": {"git": "git://github.com/awwx/meteor-git-commit-sha.git"},
     "windowtest": {"git": "git://github.com/awwx/meteor-windowtest.git"}
   }
 }

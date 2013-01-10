@@ -1,5 +1,6 @@
 {
   "name": "example windowtest",
+  "windowtest": true,
   "where": "saucelabs",
   "parallelTests": 3,
   "browsers": [

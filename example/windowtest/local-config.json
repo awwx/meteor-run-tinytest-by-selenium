@@ -1,6 +1,6 @@
 {
-  "where": "local",
   "windowtest": true,
+  "where": "local",
   "selenium_server": ["localhost", 4444],
   "browsers": [
     { "browserName": "firefox" }
