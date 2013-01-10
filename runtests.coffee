@@ -157,6 +157,10 @@ run_tests_on_browser = (run, browser_capabilities) ->
       browser.setImplicitWaitTimeout 1000
       browser.get url
 
+      ok = poll 10000, 1000, (-> browser.hasElementByCssSelector('.header')),
+        (-> log 'waiting for test-in-browser\'s .header div to appear')
+      throw new Error('test-in-browser .header div not found') unless ok?
+
       userAgent = browser.eval 'navigator.userAgent'
       log 'userAgent:', userAgent
 
@@ -169,10 +173,6 @@ run_tests_on_browser = (run, browser_capabilities) ->
         data['custom-data'] = {userAgent} if userAgent?
         data['build']       = git_commit  if git_commit?
         set_saucelabs_test_data session_id, data
-
-      ok = poll 10000, 1000, (-> browser.hasElementByCssSelector('.header')),
-        (-> log 'waiting for test-in-browser\'s .header div to appear')
-      throw new Error('test-in-browser .header div not found') unless ok?
 
       if test_config.windowtest
         browser.elementById('begin-tests-button').click()
