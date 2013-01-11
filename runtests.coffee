@@ -186,10 +186,10 @@ run_tests_on_browser = (run, browser_capabilities) ->
 
       log 'tests are running'
 
-      result = poll 10000, 1000, (->
-        ## TODO I haven't been able to get switching focus to another window
-        ## to work; I always get "NoSuchWindow".
-        # browser.window mainWindowHandle
+      result = poll 20000, 1000, (->
+        ## TODO Switching focus to another window doesn't appear to work
+        ## with Opera.
+        browser.window mainWindowHandle
 
         if browser.hasElementByCssSelector('.header.pass')
           'pass'
